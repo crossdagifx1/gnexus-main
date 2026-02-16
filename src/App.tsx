@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { PageTransition } from "@/components/PageTransition";
 import AIChatWidget from "@/components/AIChatWidget";
 import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
@@ -57,6 +57,7 @@ const Register = lazy(() => import("./pages/auth/Register"));
 const ForgotPassword = lazy(() => import("./pages/auth/ForgotPassword"));
 const ResetPassword = lazy(() => import("./pages/auth/ResetPassword"));
 const VerifyEmail = lazy(() => import("./pages/auth/VerifyEmail"));
+const VerifyEmailRequired = lazy(() => import("./pages/auth/VerifyEmailRequired"));
 
 // Client portal pages
 const ClientDashboardLayout = lazy(() => import("./components/client/ClientDashboardLayout").then(m => ({ default: m.ClientDashboardLayout })));
@@ -142,11 +143,15 @@ const App = () => {
                       <Route path="/auth" element={<Auth />} />
 
                       {/* Auth Routes (Public) */}
+                      {/* Redirect /admin/login to /login */}
+                      <Route path="/admin/login" element={<Navigate to="/login" replace />} />
+
                       <Route path="/login" element={<Login />} />
                       <Route path="/register" element={<Register />} />
                       <Route path="/forgot-password" element={<ForgotPassword />} />
                       <Route path="/reset-password" element={<ResetPassword />} />
                       <Route path="/verify-email" element={<VerifyEmail />} />
+                      <Route path="/verify-email-required" element={<VerifyEmailRequired />} />
 
                       {/* CLIENT PORTAL - Auth Required */}
                       <Route element={<AuthProtectedRoute><div /></AuthProtectedRoute>}>

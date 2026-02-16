@@ -525,6 +525,7 @@ if (strpos($action, 'register') !== false ||
     strpos($action, 'forgot-password') !== false ||
     strpos($action, 'reset-password') !== false ||
     strpos($action, 'resend-verification') !== false ||
+    strpos($action, 'verify-email') !== false ||
     $action === 'me' ||
     strpos($action, 'profile') !== false ||
     strpos($action, 'password') !== false ||

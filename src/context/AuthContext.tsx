@@ -11,6 +11,7 @@ interface User {
     email_verified: boolean;
     is_active: boolean;
     created_at: string;
+    role?: string;
 }
 
 interface AuthContextType {

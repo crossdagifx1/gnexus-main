@@ -26,8 +26,8 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
         return <Navigate to="/login" state={{ from: location }} replace />;
     }
 
-    // Check email verification
-    if (user && !user.email_verified) {
+    // Check email verification - skip for admins
+    if (user && !user.email_verified && user.role !== 'admin') {
         return <Navigate to="/verify-email-required" replace />;
     }
 
