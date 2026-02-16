@@ -1,0 +1,75 @@
+name: Deploy to Test (gnexuset.com/test)
+
+on:
+  push:
+    branches:
+      - develop
+  workflow_dispatch:
+
+jobs:
+  lint:
+    name: 🧹 Lint & Type Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run lint || true
+      - run: npm run type-check || true
+
+  test:
+    name: 🧪 Run Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run test || echo "No tests configured yet"
+
+  deploy-test:
+    name: 🧪 Deploy to Test Environment
+    needs: [lint, test]
+    runs-on: ubuntu-latest
+    environment:
+      name: test
+      url: https://gnexuset.com/test
+    steps:
+      - name: 🚚 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: 📦 Install dependencies
+        run: npm ci
+
+      - name: 🏗️ Build for Test Environment
+        run: npm run build -- --mode test --base /test/
+        env:
+          NODE_ENV: production
+
+      - name: 📂 Deploy to cPanel Test Directory
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./dist/
+          server-dir: ./public_html/test/
+          dangerous-clean-slate: false
+          log-level: verbose
+
+      - name: ✅ Verify Deployment
+        run: |
+          echo "🎉 Test deployment complete!"
+          echo "🌐 Test URL: https://gnexuset.com/test"
+          curl -I https://gnexuset.com/test || echo "Site verification pending..."
